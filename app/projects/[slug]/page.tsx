@@ -8,28 +8,33 @@ import { Redis } from "@upstash/redis";
 
 export const revalidate = 60;
 
-type Props = {
+// ✅ Define the props structure
+interface PageProps {
   params: {
     slug: string;
   };
-};
+}
 
+// ✅ Create Redis instance from environment
 const redis = Redis.fromEnv();
 
-export async function generateStaticParams(): Promise<Props["params"][]> {
+// ✅ Generate static paths
+export async function generateStaticParams(): Promise<PageProps["params"][]> {
   return allProjects
-    .filter((p) => p.published)
-    .map((p) => ({
-      slug: p.slug,
+    .filter((project) => project.published)
+    .map((project) => ({
+      slug: project.slug,
     }));
 }
 
-export default async function PostPage({ params }: Props) {
+// ✅ Main page component
+export default async function PostPage({ params }: PageProps) {
   const slug = params?.slug;
   const project = allProjects.find((project) => project.slug === slug);
 
   if (!project) {
     notFound();
+    return null; // TypeScript safeguard
   }
 
   const views =
