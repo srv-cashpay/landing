@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const redis = Redis.fromEnv();
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs",
 };
 
 export default async function incr(req: NextRequest): Promise<NextResponse> {
