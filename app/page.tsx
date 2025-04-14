@@ -3,33 +3,10 @@ import Image from "next/image";
 import React from "react";
 import Particles from "./components/particles";
 
-// Navigation items (tanpa Android App sekarang)
-const navigation = [
-  { name: "Projects", href: "/projects" },
-  { name: "Contact", href: "/contact" },
-];
 
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen overflow-hidden bg-gradient-to-tl from-black via-zinc-600/20 to-black">
-      
-      {/* Navigation */}
-      <nav className="my-16 animate-fade-in">
-        <ul className="flex items-center justify-center gap-4">
-          {navigation.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                target={item.href.startsWith("http") ? "_blank" : "_self"}
-                rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="text-sm duration-500 text-zinc-500 hover:text-zinc-300"
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
 
       {/* Top Glow */}
       <div className="hidden w-screen h-px animate-glow md:block animate-fade-left bg-gradient-to-r from-zinc-300/0 via-zinc-300/50 to-zinc-300/0" />
@@ -47,18 +24,13 @@ export default function Home() {
 
       {/* Subtitle + Android App Button */}
       <div className="my-16 text-center animate-fade-in flex flex-col items-center gap-4">
+
         <h2 className="text-sm text-zinc-500">
-          I'm building{" "}
-          <Link
-            target="_blank"
-            href="https://unkey.dev"
-            className="underline duration-500 hover:text-zinc-300"
-            rel="noopener noreferrer"
-          >
-            unkey.dev
-          </Link>{" "}
-          to solve API authentication and authorization for developers.
+        Simplifying payments, one transaction at a time.
         </h2>
+        <b><h2 className="text-sm text-zinc-500">
+          Download Now
+        </h2></b>
 
         {/* Android App Google Play Badge */}
         <Link
