@@ -30,9 +30,6 @@ export default function Home() {
 
       {/* Subtitle + Android App Button */}
       <div className="my-16 text-center animate-fade-in flex flex-col items-center gap-4">
-        <b><h2 className="text-sm text-zinc-500">
-          Download Now
-        </h2></b>
 
         {/* Android App Google Play Badge */}
         <Link
