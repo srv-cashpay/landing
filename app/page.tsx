@@ -53,7 +53,6 @@ export default function Home() {
             alt="Get it on Google Play"
             width={160}
             height={60}
-            className="hover:opacity-80"
           />
         </Link>
       </div>
