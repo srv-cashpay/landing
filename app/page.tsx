@@ -50,10 +50,7 @@ export default function Home() {
         >
           <Image
             src="/google-play-app-store.png" // Ganti sesuai file di folder /public
-            alt="Get it on Google Play"
-            width={160}
-            height={60}
-          />
+            alt="Get it on Google Play"          />
         </Link>
       </div>
     </div>
