@@ -10,6 +10,9 @@ export default function Home() {
 
       {/* Top Glow */}
       <div className="hidden w-screen h-px animate-glow md:block animate-fade-left bg-gradient-to-r from-zinc-300/0 via-zinc-300/50 to-zinc-300/0" />
+      <h2 className="text-sm text-zinc-500">
+        Simplifying payments, one transaction at a time.
+        </h2>
 
       {/* Particles */}
       <Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={100} />
@@ -24,9 +27,6 @@ export default function Home() {
 
       {/* Subtitle + Android App Button */}
       <div className="my-16 text-center animate-fade-in flex flex-col items-center gap-4">
-        <h2 className="text-sm text-zinc-500">
-        Simplifying payments, one transaction at a time.
-        </h2>
         <b><h2 className="text-sm text-zinc-500">
           Download Now
         </h2></b>
