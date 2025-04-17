@@ -1,78 +1,95 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function PaymentChecklist() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
   const orderId = searchParams.get("order_id");
   const statusCode = searchParams.get("status_code");
   const transactionStatus = searchParams.get("transaction_status");
 
-  const [paymentData, setPaymentData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [confirmationStatus, setConfirmationStatus] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [hasConfirmed, setHasConfirmed] = useState(false);
 
-  useEffect(() => {
-    const fetchPaymentData = async () => {
-      try {
-        const response = await fetch("http://103.127.134.78:2358/midtrans/callback", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            order_id: orderId,
-            status_code: statusCode,
-            transaction_status: transactionStatus,
-          }),
-        });
+  const handlePaymentConfirmation = async () => {
+    setLoading(true);
+    setError(null);
+    setHasConfirmed(true); // untuk cegah konfirmasi ganda
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch payment data");
-        }
+    try {
+      const response = await fetch("http://103.127.134.78:2358/midtrans/callback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          status_code: statusCode,
+          transaction_status: transactionStatus,
+        }),
+      });
 
-        const data = await response.json();
-        setPaymentData(data);  // Save the data into state
-      } catch (err) {
-        setError(err.message);  // Handle any errors
-      } finally {
-        setLoading(false);  // Set loading to false once the fetch is complete
+      if (!response.ok) {
+        throw new Error("Gagal mengonfirmasi pembayaran");
       }
-    };
 
-    if (orderId && statusCode && transactionStatus) {
-      fetchPaymentData();  // Call the function to fetch payment data
+      const data = await response.json();
+      setConfirmationStatus(data);
+      alert("Pembayaran berhasil dikonfirmasi!");
+
+      // Auto back setelah 2 detik
+      setTimeout(() => {
+        router.back();
+      }, 5000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  }, [orderId, statusCode, transactionStatus]);
-
-  const handlePaymentConfirmation = () => {
-    alert("Pembayaran dikonfirmasi!");
   };
 
-  if (loading) return <p>Loading...</p>;  // Show loading state
-  if (error) return <p>Error: {error}</p>;  // Show error state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasConfirmed && orderId && statusCode && transactionStatus) {
+        handlePaymentConfirmation();
+      }
+    }, 3000); // auto confirm dalam 3 detik jika tidak diklik
+
+    return () => clearTimeout(timer);
+  }, [hasConfirmed, orderId, statusCode, transactionStatus]);
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-2xl">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">Payment Info</h2>
 
       <div className="text-sm text-gray-600 mb-6">
-        <p><strong>Order ID:</strong> {orderId || paymentData?.order_id}</p>
-        <p><strong>Status Code:</strong> {statusCode || paymentData?.status_code}</p>
-        <p><strong>Transaction Status:</strong> {transactionStatus || paymentData?.transaction_status}</p>
-        <p><strong>Payment Type:</strong> {paymentData?.payment_type}</p>
-        <p><strong>Amount:</strong> {paymentData?.gross_amount} {paymentData?.currency}</p>
-        <p><strong>Issuer:</strong> {paymentData?.issuer}</p>
-        <p><strong>Transaction Time:</strong> {paymentData?.transaction_time}</p>
+        <p><strong>Order ID:</strong> {orderId}</p>
+        <p><strong>Status Code:</strong> {statusCode}</p>
+        <p><strong>Transaction Status:</strong> {transactionStatus}</p>
       </div>
 
       <button
         className="w-full py-2 px-4 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
         onClick={handlePaymentConfirmation}
+        disabled={loading || hasConfirmed}
       >
-        Konfirmasi Pembayaran
+        {loading ? "Mengonfirmasi..." : "Konfirmasi Pembayaran"}
       </button>
+
+      {error && (
+        <p className="mt-4 text-red-500 text-sm">❌ {error}</p>
+      )}
+
+      {confirmationStatus && (
+        <div className="mt-4 text-green-600 text-sm">
+          ✅ Pembayaran dikonfirmasi: {confirmationStatus?.status_message || "Berhasil"}
+        </div>
+      )}
     </div>
   );
 }
