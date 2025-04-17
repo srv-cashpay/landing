@@ -61,6 +61,10 @@ export default function PaymentChecklist() {
         <p><strong>Order ID:</strong> {orderId || paymentData?.order_id}</p>
         <p><strong>Status Code:</strong> {statusCode || paymentData?.status_code}</p>
         <p><strong>Transaction Status:</strong> {transactionStatus || paymentData?.transaction_status}</p>
+        <p><strong>Payment Type:</strong> {paymentData?.payment_type}</p>
+        <p><strong>Amount:</strong> {paymentData?.gross_amount} {paymentData?.currency}</p>
+        <p><strong>Issuer:</strong> {paymentData?.issuer}</p>
+        <p><strong>Transaction Time:</strong> {paymentData?.transaction_time}</p>
       </div>
 
       <button
