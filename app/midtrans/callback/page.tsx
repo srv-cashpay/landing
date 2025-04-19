@@ -9,17 +9,17 @@ export default function PaymentChecklist() {
 
   const orderId = searchParams?.get("order_id") ?? "";
   const statusCode = searchParams?.get("status_code") ?? "";
-  const transactionStatus = searchParams?.get("transaction_status") ?? "";  
+  const transactionStatus = searchParams?.get("transaction_status") ?? "";
 
-  const [confirmationStatus, setConfirmationStatus] = useState(null);
-  const [error, setError] = useState(null);
+  const [confirmationStatus, setConfirmationStatus] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasConfirmed, setHasConfirmed] = useState(false);
 
   const handlePaymentConfirmation = async () => {
     setLoading(true);
     setError(null);
-    setHasConfirmed(true); // untuk cegah konfirmasi ganda
+    setHasConfirmed(true); // cegah konfirmasi ganda
 
     try {
       const response = await fetch("http://103.127.134.78:2358/midtrans/callback", {
@@ -42,7 +42,7 @@ export default function PaymentChecklist() {
       setConfirmationStatus(data);
       alert("Pembayaran berhasil dikonfirmasi!");
 
-      // Auto back setelah 2 detik
+      // Auto back setelah 5 detik
       setTimeout(() => {
         router.back();
       }, 5000);
@@ -62,7 +62,7 @@ export default function PaymentChecklist() {
       if (!hasConfirmed && orderId && statusCode && transactionStatus) {
         handlePaymentConfirmation();
       }
-    }, 3000); // auto confirm dalam 3 detik jika tidak diklik
+    }, 3000); // auto confirm setelah 3 detik jika belum diklik
 
     return () => clearTimeout(timer);
   }, [hasConfirmed, orderId, statusCode, transactionStatus]);
