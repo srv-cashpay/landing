@@ -47,7 +47,11 @@ export default function PaymentChecklist() {
         router.back();
       }, 5000);
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Terjadi kesalahan tak dikenal.");
+      }
     } finally {
       setLoading(false);
     }
