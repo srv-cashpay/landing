@@ -7,9 +7,9 @@ export default function PaymentChecklist() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const orderId = searchParams.get("order_id");
-  const statusCode = searchParams.get("status_code");
-  const transactionStatus = searchParams.get("transaction_status");
+  const orderId = searchParams?.get("order_id") ?? "";
+  const statusCode = searchParams?.get("status_code") ?? "";
+  const transactionStatus = searchParams?.get("transaction_status") ?? "";  
 
   const [confirmationStatus, setConfirmationStatus] = useState(null);
   const [error, setError] = useState(null);
