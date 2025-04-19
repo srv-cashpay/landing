@@ -3,6 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+interface PaymentResponse {
+  status_message?: string;
+  [key: string]: any;
+}
+
 export default function PaymentChecklist() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -11,10 +16,10 @@ export default function PaymentChecklist() {
   const statusCode = searchParams?.get("status_code") ?? "";
   const transactionStatus = searchParams?.get("transaction_status") ?? "";
 
-  const [confirmationStatus, setConfirmationStatus] = useState<any>(null);
+  const [confirmationStatus, setConfirmationStatus] = useState<PaymentResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasConfirmed, setHasConfirmed] = useState<boolean>(false);
 
   const handlePaymentConfirmation = async () => {
     setLoading(true);
@@ -22,7 +27,7 @@ export default function PaymentChecklist() {
     setHasConfirmed(true); // cegah konfirmasi ganda
 
     try {
-      const response = await fetch("http://103.127.134.78:2358/midtrans/callback", {
+      const response = await fetch("/api/confirm-payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +43,7 @@ export default function PaymentChecklist() {
         throw new Error("Gagal mengonfirmasi pembayaran");
       }
 
-      const data = await response.json();
+      const data: PaymentResponse = await response.json();
       setConfirmationStatus(data);
       alert("Pembayaran berhasil dikonfirmasi!");
 
@@ -46,7 +51,7 @@ export default function PaymentChecklist() {
       setTimeout(() => {
         router.back();
       }, 5000);
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -62,7 +67,7 @@ export default function PaymentChecklist() {
       if (!hasConfirmed && orderId && statusCode && transactionStatus) {
         handlePaymentConfirmation();
       }
-    }, 3000); // auto confirm setelah 3 detik jika belum diklik
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [hasConfirmed, orderId, statusCode, transactionStatus]);
