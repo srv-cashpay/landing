@@ -57,6 +57,7 @@ const Footer: React.FC = () => {
             </div>
             <div className="mt-8 md:text-center text-foreground-accent px-6">
                 <p>Copyright &copy; {new Date().getFullYear()}. Cashpay Ltd.</p>
+                <p className="text-sm mt-2 text-gray-500"><a href="/privacy" target="_blank">Privacy</a></p>
             </div>
         </footer>
     );
