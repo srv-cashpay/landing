@@ -1,9 +1,15 @@
-"use client";  // karena kita pakai hook di komponen client
+"use client";
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
 
-const menuData = {
+type MenuItem = {
+  id: number;
+  name: string;
+  price: number;
+};
+
+const menuData: Record<string, MenuItem[]> = {
   greetinc: [
     { id: 1, name: "Nasi Goreng", price: 15000 },
     { id: 2, name: "Mie Ayam", price: 12000 },
@@ -14,11 +20,11 @@ const menuData = {
   ],
 };
 
-const MenuMakan = () => {
+const MenuMakan: React.FC = () => {
   const searchParams = useSearchParams();
-  const merchant = searchParams.get("merchant");
+  const merchant = searchParams.get("merchant") ?? "";
 
-  const menu = menuData[merchant] || [];
+  const menu: MenuItem[] = menuData[merchant] || [];
 
   return (
     <div style={styles.container}>
@@ -40,7 +46,7 @@ const MenuMakan = () => {
   );
 };
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: "20px",
     fontFamily: "Arial, sans-serif",
