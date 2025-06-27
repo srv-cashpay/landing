@@ -56,7 +56,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(2, 1fr)",  // 2 kolom
     gap: "20px",
   },
   card: {
