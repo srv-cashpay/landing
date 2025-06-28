@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 type ApiRow = {
   id: string;
@@ -21,13 +22,20 @@ type Product = {
 };
 
 const MenuMakan: React.FC = () => {
+  const searchParams = useSearchParams();
+  const merchantId = searchParams.get("merchant_id");
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (!merchantId) {
+      alert("Merchant ID tidak ditemukan di URL");
+      setLoading(false);
+      return;
+    }
+
     const fetchProducts = async () => {
       try {
-        const merchantId = "fcb0a976-d3b8-4534-9eb8-12c2a7594b08";
         const response = await axios.get(`https://cashpay.my.id:2360/menu?merchant_id=${merchantId}`);
 
         if (response.data?.success) {
@@ -36,7 +44,7 @@ const MenuMakan: React.FC = () => {
             id: row.id,
             product_name: row.product_name,
             price: row.price,
-            image_url: row.image ? `https://cashpay.my.id:2358/${row.image.file_path}` : null
+            image_url: row.image ? `https://cashpay.my.id:2358/${row.image.file_path}` : null,
           }));
           setProducts(data);
         } else {
@@ -54,7 +62,7 @@ const MenuMakan: React.FC = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [merchantId]);
 
   return (
     <div style={styles.container}>
