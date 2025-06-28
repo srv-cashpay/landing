@@ -2,6 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Image from "next/image";
+
+type ApiRow = {
+  id: string;
+  product_name: string;
+  price: number;
+  image: {
+    file_path: string;
+  } | null;
+};
 
 type Product = {
   id: string;
@@ -19,10 +29,10 @@ const MenuMakan: React.FC = () => {
       try {
         const merchantId = "fcb0a976-d3b8-4534-9eb8-12c2a7594b08";
         const response = await axios.get(`https://cashpay.my.id:2360/menu?merchant_id=${merchantId}`);
-        
+
         if (response.data?.success) {
-          const rows = response.data.data?.rows || [];
-          const data = rows.map((row: any) => ({
+          const rows: ApiRow[] = response.data.data?.rows || [];
+          const data: Product[] = rows.map((row) => ({
             id: row.id,
             product_name: row.product_name,
             price: row.price,
@@ -32,9 +42,12 @@ const MenuMakan: React.FC = () => {
         } else {
           alert(response.data.message || "Gagal mendapatkan produk");
         }
-      } catch (err: any) {
-        console.error(err);
-        alert(err.message || "Terjadi kesalahan");
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          alert(err.message || "Terjadi kesalahan");
+        } else {
+          console.error(err);
+        }
       } finally {
         setLoading(false);
       }
@@ -56,9 +69,11 @@ const MenuMakan: React.FC = () => {
           {products.map((product) => (
             <div key={product.id} style={styles.card}>
               {product.image_url && (
-                <img
+                <Image
                   src={product.image_url}
                   alt={product.product_name}
+                  width={300}
+                  height={180}
                   style={styles.image}
                 />
               )}
@@ -95,11 +110,9 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
   },
   image: {
-    width: "100%",
-    height: "150px",
-    objectFit: "cover",
     borderRadius: "6px",
     marginBottom: "10px",
+    objectFit: "cover",
   },
   button: {
     backgroundColor: "#4CAF50",
