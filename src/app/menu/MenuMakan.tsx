@@ -1,41 +1,69 @@
 "use client";
 
-import React from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-type MenuItem = {
-  id: number;
-  name: string;
+type Product = {
+  id: string;
+  product_name: string;
   price: number;
-};
-
-const menuData: Record<string, MenuItem[]> = {
-  greetinc: [
-    { id: 1, name: "Nasi Goreng", price: 15000 },
-    { id: 2, name: "Mie Ayam", price: 12000 },
-  ],
-  warung123: [
-    { id: 3, name: "Sate Ayam", price: 20000 },
-    { id: 4, name: "Bakso", price: 13000 },
-  ],
+  image_url: string | null;
 };
 
 const MenuMakan: React.FC = () => {
-  const searchParams = useSearchParams();
-  const merchant = searchParams.get("merchant") ?? "";
-  const menu: MenuItem[] = menuData[merchant] || [];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const merchantId = "fcb0a976-d3b8-4534-9eb8-12c2a7594b08";
+        const response = await axios.get(`https://cashpay.my.id:2360/menu?merchant_id=${merchantId}`);
+        
+        if (response.data?.success) {
+          const rows = response.data.data?.rows || [];
+          const data = rows.map((row: any) => ({
+            id: row.id,
+            product_name: row.product_name,
+            price: row.price,
+            image_url: row.image ? `https://cashpay.my.id:2358/${row.image.file_path}` : null
+          }));
+          setProducts(data);
+        } else {
+          alert(response.data.message || "Gagal mendapatkan produk");
+        }
+      } catch (err: any) {
+        console.error(err);
+        alert(err.message || "Terjadi kesalahan");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Menu {merchant || "Tidak Diketahui"}</h1>
-      {menu.length === 0 ? (
-        <p>Tidak ada menu untuk merchant ini.</p>
+      <h1 style={styles.title}>Daftar Produk</h1>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : products.length === 0 ? (
+        <p>Tidak ada produk ditemukan</p>
       ) : (
         <div style={styles.grid}>
-          {menu.map((item) => (
-            <div key={item.id} style={styles.card}>
-              <h2>{item.name}</h2>
-              <p>Harga: Rp {item.price.toLocaleString()}</p>
+          {products.map((product) => (
+            <div key={product.id} style={styles.card}>
+              {product.image_url && (
+                <img
+                  src={product.image_url}
+                  alt={product.product_name}
+                  style={styles.image}
+                />
+              )}
+              <h2>{product.product_name}</h2>
+              <p>Harga: Rp {product.price.toLocaleString()}</p>
               <button style={styles.button}>Pesan</button>
             </div>
           ))}
@@ -56,7 +84,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",  // 2 kolom
+    gridTemplateColumns: "repeat(2, 1fr)",
     gap: "20px",
   },
   card: {
@@ -65,6 +93,13 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "10px",
     textAlign: "center",
     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+  },
+  image: {
+    width: "100%",
+    height: "150px",
+    objectFit: "cover",
+    borderRadius: "6px",
+    marginBottom: "10px",
   },
   button: {
     backgroundColor: "#4CAF50",
