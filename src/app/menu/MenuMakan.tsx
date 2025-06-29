@@ -21,11 +21,19 @@ type Product = {
   image_url: string | null;
 };
 
+type CartItem = {
+  product: Product;
+  quantity: number;
+};
+
 const MenuMakan: React.FC = () => {
   const searchParams = useSearchParams();
   const merchantId = searchParams.get("merchant_id");
   const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showCart, setShowCart] = useState<boolean>(false);
+  const [namaPemesan, setNamaPemesan] = useState<string>("");
 
   useEffect(() => {
     if (!merchantId) {
@@ -37,7 +45,6 @@ const MenuMakan: React.FC = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(`https://cashpay.my.id:2360/menu?merchant_id=${merchantId}`);
-
         if (response.data?.success) {
           const rows: ApiRow[] = response.data.data?.rows || [];
           const data: Product[] = rows.map((row) => ({
@@ -64,6 +71,30 @@ const MenuMakan: React.FC = () => {
     fetchProducts();
   }, [merchantId]);
 
+  const handleAddToCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.product.id === product.id);
+      if (existingItem) {
+        return prevCart.map((item) =>
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevCart, { product, quantity: 1 }];
+      }
+    });
+  };
+
+  const handleSelesai = () => {
+    alert(`Pesanan atas nama: ${namaPemesan}\nPesanan Anda sudah diproses.`);
+    setCart([]);
+    setNamaPemesan("");
+    setShowCart(false);
+  };
+
+  const isSelesaiDisabled = cart.length === 0 || namaPemesan.trim() === "";
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Daftar Produk</h1>
@@ -87,9 +118,63 @@ const MenuMakan: React.FC = () => {
               )}
               <h2>{product.product_name}</h2>
               <p>Harga: Rp {product.price.toLocaleString()}</p>
-              <button style={styles.button}>Pesan</button>
+              <button style={styles.button} onClick={() => handleAddToCart(product)}>
+                Pesan
+              </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Footer button */}
+      <div style={styles.footer}>
+        <button style={styles.cartButton} onClick={() => setShowCart(true)}>
+          Lihat Keranjang ({cart.reduce((acc, item) => acc + item.quantity, 0)})
+        </button>
+      </div>
+
+      {/* Cart Modal */}
+      {showCart && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h2>Keranjang</h2>
+            {cart.length === 0 ? (
+              <p>Keranjang kosong</p>
+            ) : (
+              <>
+                <ul style={{ listStyle: "none", padding: 0 }}>
+                  {cart.map((item) => (
+                    <li key={item.product.id}>
+                      {item.product.product_name} - {item.quantity}x (Rp {item.product.price.toLocaleString()})
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ margin: "10px 0" }}>
+                  <input
+                    type="text"
+                    placeholder="Atas nama siapa?"
+                    value={namaPemesan}
+                    onChange={(e) => setNamaPemesan(e.target.value)}
+                    style={styles.input}
+                  />
+                </div>
+              </>
+            )}
+            <div style={{ marginTop: "20px", textAlign: "right" }}>
+              <button style={styles.closeButton} onClick={() => setShowCart(false)}>Tutup</button>
+              <button
+                style={{
+                  ...styles.finishButton,
+                  backgroundColor: isSelesaiDisabled ? "#ccc" : "#4CAF50",
+                  cursor: isSelesaiDisabled ? "not-allowed" : "pointer",
+                }}
+                onClick={handleSelesai}
+                disabled={isSelesaiDisabled}
+              >
+                Selesai
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -100,6 +185,8 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: "20px",
     fontFamily: "Arial, sans-serif",
+    position: "relative",
+    minHeight: "100vh",
   },
   title: {
     textAlign: "center",
@@ -129,6 +216,65 @@ const styles: Record<string, React.CSSProperties> = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
+  },
+  footer: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    backgroundColor: "#f8f8f8",
+    padding: "10px",
+    borderTop: "1px solid #ddd",
+    textAlign: "center",
+  },
+  cartButton: {
+    backgroundColor: "#2196F3",
+    color: "white",
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modal: {
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "8px",
+    width: "90%",
+    maxWidth: "400px",
+  },
+  closeButton: {
+    backgroundColor: "#aaa",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginRight: "10px",
+  },
+  finishButton: {
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  input: {
+    width: "100%",
+    padding: "8px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
   },
 };
 
