@@ -35,6 +35,45 @@ const MenuMakan: React.FC = () => {
   const [showCart, setShowCart] = useState<boolean>(false);
   const [namaPemesan, setNamaPemesan] = useState<string>("");
 
+const handleSelesai = async () => {
+  if (!merchantId) {
+    alert("Merchant ID tidak ditemukan");
+    return;
+  }
+
+  const orderPayload = {
+    order_name: namaPemesan,
+    product: cart.map((item) => ({
+      product_name: item.product.product_name,
+      price: item.product.price,
+      quantity: item.quantity,
+    })),
+  };
+
+  try {
+    const response = await axios.post(
+      `https://cashpay.my.id:2358/menu/order?merchant_id=${merchantId}`,
+      orderPayload
+    );
+
+    if (response.data?.status === true) {
+      alert(response.data.message || `Pesanan atas nama: ${namaPemesan} berhasil disimpan.`);
+      setCart([]);
+      setNamaPemesan("");
+      setShowCart(false);
+    } else {
+      alert(response.data.message || "Gagal memproses pesanan");
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      alert(err.message || "Terjadi kesalahan saat memesan");
+    } else {
+      console.error(err);
+      alert("Terjadi kesalahan tidak terduga");
+    }
+  }
+};
+
   useEffect(() => {
     if (!merchantId) {
       alert("Merchant ID tidak ditemukan di URL");
@@ -86,12 +125,11 @@ const MenuMakan: React.FC = () => {
     });
   };
 
-  const handleSelesai = () => {
-    alert(`Pesanan atas nama: ${namaPemesan}\nPesanan Anda sudah diproses.`);
-    setCart([]);
-    setNamaPemesan("");
-    setShowCart(false);
-  };
+  const handleRemoveFromCart = (productId: string) => {
+  setCart((prevCart) => prevCart.filter(item => item.product.id !== productId));
+};
+
+ 
 
   const isSelesaiDisabled = cart.length === 0 || namaPemesan.trim() === "";
 
@@ -143,11 +181,27 @@ const MenuMakan: React.FC = () => {
             ) : (
               <>
                 <ul style={{ listStyle: "none", padding: 0 }}>
-                  {cart.map((item) => (
-                    <li key={item.product.id}>
-                      {item.product.product_name} - {item.quantity}x (Rp {item.product.price.toLocaleString()})
-                    </li>
-                  ))}
+                 {cart.map((item) => (
+                <li key={item.product.id} style={{ marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>
+                    {item.product.product_name} - {item.quantity}x (Rp {item.product.price.toLocaleString()})
+                  </span>
+                  <button
+                    onClick={() => handleRemoveFromCart(item.product.id)}
+                    style={{
+                      backgroundColor: '#f44336',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '4px 8px',
+                      cursor: 'pointer',
+                      marginLeft: '8px'
+                    }}
+                  >
+                    Hapus
+                  </button>
+                </li>
+              ))}
                 </ul>
                 <div style={{ margin: "10px 0" }}>
                   <input
