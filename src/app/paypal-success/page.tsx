@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export default function PaypalSuccessPage() {
   const searchParams = useSearchParams();
@@ -42,11 +42,15 @@ useEffect(() => {
         setStatus('error');
         setError('Pembayaran belum selesai. Silakan hubungi support.');
       }
-    } catch (err: any) {
-      console.error('Capture failed:', err.response?.data || err.message);
-      setStatus('error');
-      setError(err.response?.data?.message || 'Terjadi kesalahan saat memproses pembayaran.');
-    }
+    } catch (err: unknown) {
+  if (err instanceof AxiosError) {
+    setError(err.response?.data?.message || 'Terjadi kesalahan saat memproses pembayaran.');
+  } else if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('Unknown error occurred');
+  }
+}
   };
 
   return (
