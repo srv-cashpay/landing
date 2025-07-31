@@ -23,7 +23,7 @@ export const benefits: IBenefit[] = [
                 icon: <FiTrendingUp size={26} />
             }
         ],
-        imageSrc: "/images/mock.png"
+        imageSrc: "/images/dashboard1.png"
     },
     {
         title: "Self Order",
@@ -45,7 +45,7 @@ export const benefits: IBenefit[] = [
                 icon: <FiPieChart size={26} />
             }
         ],
-        imageSrc: "/images/profile.png"
+        imageSrc: "/images/scan1.png"
     },
     {
         title: "Inventory Management",
