@@ -19,9 +19,7 @@ export default function PaypalSuccessContent() {
 
   const captureOrder = async (orderId: string) => {
     try {
-      const res = await axios.post('https://cashpay.my.id:2358/paypal/capture', {
-        order_id: orderId,
-      });
+      const res = await axios.get(`https://cashpay.my.id:2358/sub/paypal/capture/${orderId}`);
 
       if (res.data.status === 'COMPLETED') {
         setStatus('success');

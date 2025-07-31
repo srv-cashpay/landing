@@ -4,66 +4,66 @@ import { IBenefit } from "@/types"
 
 export const benefits: IBenefit[] = [
     {
-        title: "Smart Budgeting",
-        description: "Take the guesswork out of managing your money. Our AI-powered budgeting tool adapts to your lifestyle and helps you stay on track.",
+        title: "Smart Dashboard",
+        description: "Stay in control of your business with a real-time, intuitive dashboard designed for smooth daily operations.",
         bullets: [
             {
-                title: "Intelligent Categorization",
+                title: "Great Classification",
                 description: "Automatically sorts your transactions for crystal-clear insights.",
                 icon: <FiBarChart2 size={26} />
             },
             {
-                title: "Customizable Goals",
-                description: "Set and track financial objectives that matter to you.",
+                title: "Order Management",
+                description: "View and manage all incoming orders efficiently, from dine-in to takeaway and delivery.",
                 icon: <FiTarget size={26} />
             },
             {
-                title: "Predictive Analysis",
-                description: "Get ahead of your finances with spending forecasts and alerts.",
+                title: "Actionable Insights",
+                description: "Make better decisions with data-driven reports, sales summaries, and inventory trends — all in one place.",
                 icon: <FiTrendingUp size={26} />
             }
         ],
         imageSrc: "/images/mock.png"
     },
     {
-        title: "Seamless Investing",
-        description: "Start building wealth today, no financial degree required. Finwise makes investing accessible and straightforward.",
+        title: "Self Order",
+        description: "Enjoy a seamless ordering experience right from your table. Just scan, browse the menu, and place your order — no waiting required.",
         bullets: [
             {
-                title: "Micro-Investing",
-                description: "Begin with as little as $1 and watch your money grow.",
+                title: "Browse the Menu",
+                description: "Explore a wide variety of food and drinks, complete with images and descriptions — all at your fingertips.",
                 icon: <FiDollarSign size={26} />
             },
             {
-                title: "Expert Portfolios",
-                description: "Choose from investment strategies tailored to your risk tolerance.",
+                title: "Order Instantly",
+                description: "Add your favorite items to the cart and confirm your order in just a few taps. Fast, easy, and hassle-free.",
                 icon: <FiBriefcase size={26} />
             },
             {
-                title: "Real-Time Performance",
-                description: "Track your investments with easy-to-understand metrics and visuals.",
+                title: "Track Your Order",
+                description: "Stay updated with real-time order status — from kitchen preparation to delivery at your table.",
                 icon: <FiPieChart size={26} />
             }
         ],
         imageSrc: "/images/profile.png"
     },
     {
-        title: "Bank-Grade Security",
-        description: "Your financial data deserves the best protection. Rest easy knowing Finwise employs cutting-edge security measures.",
+        title: "Inventory Management",
+        description: "Keep your stock levels accurate and up-to-date — avoid overstocking or running out.",
         bullets: [
             {
-                title: "Military-Grade Encryption",
-                description: "Your information is safeguarded with the highest level of encryption.",
+                title: "Secure Stock Tracking",
+                description: "Every item movement is recorded with precision, from incoming supply to outgoing sales.",
                 icon: <FiLock size={26} />
             },
             {
-                title: "Biometric Authentication",
-                description: "Access your account securely with fingerprint or facial recognition.",
+                title: "Barcode & QR Integration",
+                description: "Scan items easily to update inventory instantly — reduce human error and speed up workflows.",
                 icon: <FiUser size={26} />
             },
             {
-                title: "Real-Time Fraud Detection",
-                description: "Our system constantly monitors for suspicious activity to keep your money safe.",
+                title: "Real-Time Alerts & Restock Reminders",
+                description: "Get notified when stock is low or nearly expired, so you can restock just in time.",
                 icon: <FiShield size={26} />
             }
         ],
