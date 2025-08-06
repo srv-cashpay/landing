@@ -1,4 +1,5 @@
-// src/components/Login.tsx
+'use client';
+
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 
 const Login: React.FC = () => {
