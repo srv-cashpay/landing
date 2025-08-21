@@ -69,9 +69,13 @@ const ChatAndPush: React.FC = () => {
       });
       const data = await res.json();
       setPushLog(JSON.stringify(data, null, 2));
-    } catch (err: any) {
+    } catch (err: unknown) {
+    if (err instanceof Error) {
       setPushLog(`Error: ${err.message}`);
+    } else {
+      setPushLog(`Unknown error: ${String(err)}`);
     }
+  }
   };
 
   // =========================
