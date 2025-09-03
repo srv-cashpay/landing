@@ -62,7 +62,7 @@ const handleSelesai = async () => {
       setNamaPemesan("");
       setShowCart(false);
     } else {
-      alert(response.data.message || "Gagal memproses pesanan");
+      alert(response.data);
     }
   } catch (err) {
     if (axios.isAxiosError(err)) {
@@ -262,6 +262,8 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "6px",
     marginBottom: "10px",
     objectFit: "cover",
+    width: "100%",      // selalu penuh lebar card
+    height: "180px",    // semua gambar punya tinggi sama
   },
   button: {
     backgroundColor: "#4CAF50",
