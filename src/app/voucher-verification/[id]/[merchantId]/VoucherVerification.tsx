@@ -12,18 +12,22 @@ type VoucherGenerate = {
   start_date: string;
   end_date: string;
   status: boolean;
-  merchant_instagram?: string; // optional, kalau API support
+  merchant_instagram?: string; // optional
 };
 
 export default function VoucherVerificationPage() {
-  const { id, merchantId } = useParams();
+  // safe typing untuk params
+  const params = useParams() as { id: string; merchantId: string };
+  const { id, merchantId } = params;
+
   const [loading, setLoading] = useState(true);
   const [voucher, setVoucher] = useState<VoucherGenerate | null>(null);
   const [error, setError] = useState("");
   const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
-  const [followed, setFollowed] = useState(false); // syarat follow IG
+  const [followed, setFollowed] = useState(false);
 
+  // Ambil data voucher
   useEffect(() => {
     async function fetchVoucher() {
       setLoading(true);
@@ -43,8 +47,12 @@ export default function VoucherVerificationPage() {
         } else {
           setError("Voucher tidak ditemukan.");
         }
-      } catch (err: any) {
-        setError(err.message || "Gagal memuat voucher.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Gagal memuat voucher.");
+        }
       } finally {
         setLoading(false);
       }
@@ -53,12 +61,13 @@ export default function VoucherVerificationPage() {
     fetchVoucher();
   }, [id, merchantId]);
 
+  // Gunakan voucher
   async function handleUseVoucher(e?: React.FormEvent) {
     e?.preventDefault();
     setError("");
 
     if (!code.trim()) {
-      setError("Kenalan dulu dong tulis nama lengkap kamu.");
+      setError("Kenalan dulu dong, tulis nama lengkap kamu.");
       return;
     }
 
@@ -69,10 +78,14 @@ export default function VoucherVerificationPage() {
 
     setVerifying(true);
     try {
-      const res = await fetch("http://localhost:2358/voucher-use", {
+      const res = await fetch("https://cashpay.my.id:2358/voucher-use", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, voucher_id: id, merchant_id: merchantId }),
+        body: JSON.stringify({
+          code,
+          voucher_id: id,
+          merchant_id: merchantId,
+        }),
       });
 
       const json = await res.json();
@@ -83,13 +96,18 @@ export default function VoucherVerificationPage() {
       } else {
         setError(json.message || "Voucher tidak valid.");
       }
-    } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan saat gunakan voucher.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Terjadi kesalahan saat gunakan voucher.");
+      }
     } finally {
       setVerifying(false);
     }
   }
 
+  // --- UI ---
   if (loading) {
     return (
       <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md">
@@ -121,7 +139,7 @@ export default function VoucherVerificationPage() {
       <h2 className="text-xl font-semibold mb-2">
         Voucher: {voucher.voucher_name}
       </h2>
-     
+
       <div className="bg-green-50 border border-green-200 rounded-md p-4 text-green-700 text-sm">
         <p>
           <strong>Status: </strong>
@@ -133,7 +151,7 @@ export default function VoucherVerificationPage() {
         </p>
       </div>
 
-      {/* Input kode + tombol gunakan voucher */}
+      {/* Input nama + tombol gunakan voucher */}
       <form onSubmit={handleUseVoucher} className="mt-6 space-y-3">
         <label className="block text-sm font-medium">Nama Lengkap</label>
         <input
@@ -143,22 +161,24 @@ export default function VoucherVerificationPage() {
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
           disabled={verifying}
         />
-         {/* Syarat follow Instagram */}
-      {voucher.merchant_instagram && (
-        <div className="mt-4 space-y-2">
-          <p className="text-sm text-gray-600">
-            Untuk menggunakan voucher ini, silakan follow Instagram:
-          </p>
-          <a
-            href={voucher.merchant_instagram}
-            target="_blank"
-            onClick={() => setFollowed(true)}
-            className="block w-full text-center px-4 py-2 rounded-lg bg-pink-600 text-white text-sm hover:bg-pink-700"
-          >
-            Follow Instagram
-          </a>
-        </div>
-      )}
+
+        {/* Syarat follow Instagram */}
+        {voucher.merchant_instagram && (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm text-gray-600">
+              Untuk menggunakan voucher ini, silakan follow Instagram:
+            </p>
+            <a
+              href={voucher.merchant_instagram}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setFollowed(true)}
+              className="block w-full text-center px-4 py-2 rounded-lg bg-pink-600 text-white text-sm hover:bg-pink-700"
+            >
+              Follow Instagram
+            </a>
+          </div>
+        )}
 
         <button
           type="submit"
