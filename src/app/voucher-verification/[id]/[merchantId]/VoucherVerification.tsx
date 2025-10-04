@@ -16,7 +16,10 @@ type VoucherGenerate = {
 };
 
 export default function VoucherVerificationPage() {
-  const { id, merchantId } = useParams<{ id: string; merchantId: string }>();
+  // safe typing untuk params
+  const params = useParams() as { id: string; merchantId: string };
+  const { id, merchantId } = params;
+
   const [loading, setLoading] = useState(true);
   const [voucher, setVoucher] = useState<VoucherGenerate | null>(null);
   const [error, setError] = useState("");
