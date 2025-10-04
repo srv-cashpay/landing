@@ -1,9 +1,7 @@
-import VoucherVerification from "./VoucherVerification";
+import dynamic from "next/dynamic";
 
-export default function Home() {
-  return (
-    <main className="p-10">
-      <VoucherVerification />
-    </main>
-  );
+const VoucherVerification = dynamic(() => import("./VoucherVerification"), { ssr: false });
+
+export default function Page() {
+  return <VoucherVerification />;
 }
