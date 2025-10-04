@@ -78,35 +78,29 @@ export default function VoucherVerificationPage() {
 
     setVerifying(true);
     try {
-      const res = await fetch("https://cashpay.my.id:2358/voucher-use", {
-        method: "POST",
+      const res = await fetch(`https://cashpay.my.id:2358/voucher-verification/${id}/${merchantId}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code,
-          voucher_id: id,
-          merchant_id: merchantId,
+          status: true,
         }),
       });
 
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || "Gagal gunakan voucher");
-
-      if (json.ok) {
-        setVoucher((prev) => (prev ? { ...prev, status: true } : prev));
-      } else {
-        setError(json.message || "Voucher tidak valid.");
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Terjadi kesalahan saat gunakan voucher.");
-      }
-    } finally {
-      setVerifying(false);
+    // update UI dan refresh page
+    setVoucher((prev) => (prev ? { ...prev, status: true } : prev));
+    window.location.reload(); // <-- refresh halaman otomatis
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError("Terjadi kesalahan saat gunakan voucher.");
     }
+  } finally {
+    setVerifying(false);
   }
-
+}
   // --- UI ---
   if (loading) {
     return (
@@ -140,58 +134,69 @@ export default function VoucherVerificationPage() {
         Voucher: {voucher.voucher_name}
       </h2>
 
-      <div className="bg-green-50 border border-green-200 rounded-md p-4 text-green-700 text-sm">
-        <p>
-          <strong>Status: </strong>
-          {voucher.status ? "Sudah digunakan" : "Belum digunakan"}
-        </p>
-        <p>
-          <strong>Berlaku: </strong>
-          {voucher.start_date} - {voucher.end_date}
-        </p>
-      </div>
+     <div
+  className={`border rounded-md p-4 text-sm ${
+    voucher.status
+      ? "bg-red-50 border-red-200 text-red-700"
+      : "bg-green-50 border-green-200 text-green-700"
+  }`}
+>
+  <p>
+    <strong>Status: </strong>
+    {voucher.status ? "Sudah digunakan" : "Belum digunakan"}
+  </p>
+  <p>
+    <strong>Berlaku: </strong>
+    {voucher.start_date} - {voucher.end_date}
+  </p>
+</div>
 
       {/* Input nama + tombol gunakan voucher */}
-      <form onSubmit={handleUseVoucher} className="mt-6 space-y-3">
-        <label className="block text-sm font-medium">Nama Lengkap</label>
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Masukkan nama lengkap"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
-          disabled={verifying}
-        />
+<form onSubmit={handleUseVoucher} className="mt-6 space-y-3">
+  <label className="block text-sm font-medium">Nama Lengkap</label>
+  <input
+    value={code}
+    onChange={(e) => setCode(e.target.value)}
+    placeholder="Masukkan nama lengkap"
+    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+    disabled={verifying || voucher.status} // juga disable input jika sudah digunakan
+  />
 
-        {/* Syarat follow Instagram */}
-        {voucher.merchant_instagram && (
-          <div className="mt-4 space-y-2">
-            <p className="text-sm text-gray-600">
-              Untuk menggunakan voucher ini, silakan follow Instagram:
-            </p>
-            <a
-              href={voucher.merchant_instagram}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setFollowed(true)}
-              className="block w-full text-center px-4 py-2 rounded-lg bg-pink-600 text-white text-sm hover:bg-pink-700"
-            >
-              Follow Instagram
-            </a>
-          </div>
-        )}
+  {/* Syarat follow Instagram */}
+  {voucher.merchant_instagram && !voucher.status && (
+    <div className="mt-4 space-y-2">
+      <p className="text-sm text-gray-600">
+        Untuk menggunakan voucher ini, silakan follow Instagram:
+      </p>
+      <a
+        href={voucher.merchant_instagram}
+        target="_blank"
+        rel="noreferrer"
+        onClick={() => setFollowed(true)}
+        className="block w-full text-center px-4 py-2 rounded-lg bg-pink-600 text-white text-sm hover:bg-pink-700"
+      >
+        Follow Instagram
+      </a>
+    </div>
+  )}
 
-        <button
-          type="submit"
-          className={`w-full px-4 py-2 rounded-lg text-white text-sm shadow-sm ${
-            verifying || !followed
-              ? "bg-indigo-300 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
-          }`}
-          disabled={verifying || !followed}
-        >
-          {verifying ? "Memproses..." : "Gunakan Voucher"}
-        </button>
-      </form>
+  {/* Tombol hanya tampil jika voucher belum digunakan */}
+  {!voucher.status && (
+    <button
+      type="submit"
+      className={`w-full px-4 py-2 rounded-lg text-white text-sm shadow-sm ${
+        verifying || !followed
+          ? "bg-indigo-300 cursor-not-allowed"
+          : "bg-indigo-600 hover:bg-indigo-700"
+      }`}
+      disabled={verifying || !followed}
+    >
+      {verifying ? "Memproses..." : "Gunakan Voucher"}
+    </button>
+  )}
+</form>
+
+
 
       {error && <div className="mt-3 text-sm text-red-600">{error}</div>}
     </div>
